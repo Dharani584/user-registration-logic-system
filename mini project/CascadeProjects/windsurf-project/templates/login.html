@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Login - User Registration System{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to your account to continue</p>
+        </div>
+        
+        <form id="loginForm" class="auth-form" method="POST" action="{{ url_for('auth.login') }}">
+            <!-- Username/Email Field -->
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <i class="fas fa-user"></i>
+                    Username or Email
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-control" 
+                    placeholder="Enter your username or email"
+                    value="{{ username or '' }}"
+                    required
+                    autofocus
+                >
+                <div id="usernameFeedback" class="validation-feedback"></div>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Password
+                </label>
+                <div class="password-input-container">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Enter your password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div id="passwordFeedback" class="validation-feedback"></div>
+            </div>
+            
+            <!-- Remember Me & Forgot Password -->
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember" class="form-checkbox">
+                    <label for="remember" class="form-checkbox-label">
+                        Remember me for 30 days
+                    </label>
+                </div>
+                <a href="#" class="forgot-password" onclick="showForgotPasswordModal(); return false;">
+                    Forgot password?
+                </a>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </div>
+            
+            <!-- Register Link -->
+            <div class="auth-links">
+                <p>Don't have an account? 
+                    <a href="{{ url_for('auth.register') }}" class="link-primary">Create one here</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgotPasswordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Reset Password</h3>
+            <button class="modal-close" onclick="closeForgotPasswordModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Enter your email address and we'll send you instructions to reset your password.</p>
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="resetEmail" class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="resetEmail" 
+                        name="resetEmail" 
+                        class="form-control" 
+                        placeholder="your@email.com"
+                        required
+                    >
+                    <div id="resetEmailFeedback" class="validation-feedback"></div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-paper-plane"></i>
+                        Send Reset Instructions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    
+    // Real-time validation
+    usernameInput.addEventListener('input', validateLoginUsername);
+    passwordInput.addEventListener('input', validateLoginPassword);
+    
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        if (!validateLoginForm()) {
+            e.preventDefault();
+        } else {
+            // Show loading state
+            const submitBtn = document.getElementById('loginBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+        }
+    });
+    
+    // Forgot password form
+    document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleForgotPassword();
+    });
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('forgotPasswordModal');
+        if (event.target === modal) {
+            closeForgotPasswordModal();
+        }
+    });
+});
+
+function validateLoginUsername() {
+    const username = document.getElementById('username').value.trim();
+    const feedback = document.getElementById('usernameFeedback');
+    
+    if (!username) {
+        showValidationFeedback(feedback, 'Username or email is required', false);
+        return false;
+    }
+    
+    showValidationFeedback(feedback, '', true);
+    return true;
+}
+
+function validateLoginPassword() {
+    const password = document.getElementById('password').value;
+    const feedback = document.getElementById('passwordFeedback');
+    
+    if (!password) {
+        showValidationFeedback(feedback, 'Password is required', false);
+        return false;
+    }
+    
+    showValidationFeedback(feedback, '', true);
+    return true;
+}
+
+function validateLoginForm() {
+    const isUsernameValid = validateLoginUsername();
+    const isPasswordValid = validateLoginPassword();
+    
+    return isUsernameValid && isPasswordValid;
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const toggle = field.nextElementSibling.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        toggle.classList.remove('fa-eye');
+        toggle.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        toggle.classList.remove('fa-eye-slash');
+        toggle.classList.add('fa-eye');
+    }
+}
+
+function showValidationFeedback(element, message, isValid) {
+    if (!message) {
+        element.textContent = '';
+        element.className = 'validation-feedback';
+        return;
+    }
+    
+    element.textContent = message;
+    element.className = 'validation-feedback ' + (isValid ? 'validation-success' : 'validation-error');
+}
+
+function showForgotPasswordModal() {
+    document.getElementById('forgotPasswordModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeForgotPasswordModal() {
+    document.getElementById('forgotPasswordModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Reset form
+    document.getElementById('forgotPasswordForm').reset();
+    document.getElementById('resetEmailFeedback').textContent = '';
+}
+
+function handleForgotPassword() {
+    const email = document.getElementById('resetEmail').value.trim();
+    const feedback = document.getElementById('resetEmailFeedback');
+    
+    // Basic email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email) {
+        showValidationFeedback(feedback, 'Email is required', false);
+        return;
+    }
+    
+    if (!emailPattern.test(email)) {
+        showValidationFeedback(feedback, 'Please enter a valid email address', false);
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#forgotPasswordForm button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    
+    // Simulate API call (in a real app, this would be an actual API request)
+    setTimeout(() => {
+        showValidationFeedback(feedback, 'If an account exists with this email, you will receive reset instructions.', true);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        
+        // Close modal after 3 seconds
+        setTimeout(() => {
+            closeForgotPasswordModal();
+        }, 3000);
+    }, 2000);
+}
+
+// Handle Enter key in forgot password modal
+document.getElementById('resetEmail').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        handleForgotPassword();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,626 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - User Registration System{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="settings-header">
+        <h1><i class="fas fa-cog"></i> Settings</h1>
+        <p>Manage your account settings and preferences</p>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-sidebar">
+            <nav class="settings-nav">
+                <a href="#general" class="nav-item active" onclick="showSection('general')">
+                    <i class="fas fa-user"></i>
+                    General
+                </a>
+                <a href="#security" class="nav-item" onclick="showSection('security')">
+                    <i class="fas fa-shield-alt"></i>
+                    Security
+                </a>
+                <a href="#notifications" class="nav-item" onclick="showSection('notifications')">
+                    <i class="fas fa-bell"></i>
+                    Notifications
+                </a>
+                <a href="#privacy" class="nav-item" onclick="showSection('privacy')">
+                    <i class="fas fa-lock"></i>
+                    Privacy
+                </a>
+                <a href="#appearance" class="nav-item" onclick="showSection('appearance')">
+                    <i class="fas fa-palette"></i>
+                    Appearance
+                </a>
+            </nav>
+        </div>
+
+        <div class="settings-main">
+            <!-- General Settings -->
+            <section id="general-section" class="settings-section active">
+                <div class="section-header">
+                    <h2>General Settings</h2>
+                    <p>Basic account information and preferences</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-group">
+                        <h3>Language</h3>
+                        <div class="setting-control">
+                            <select class="form-control" id="languageSelect">
+                                <option value="en" selected>English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                                <option value="de">Deutsch</option>
+                                <option value="zh">中文</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Timezone</h3>
+                        <div class="setting-control">
+                            <select class="form-control" id="timezoneSelect">
+                                <option value="UTC">UTC</option>
+                                <option value="EST" selected>Eastern Time (EST)</option>
+                                <option value="CST">Central Time (CST)</option>
+                                <option value="MST">Mountain Time (MST)</option>
+                                <option value="PST">Pacific Time (PST)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Date Format</h3>
+                        <div class="setting-control">
+                            <select class="form-control" id="dateFormatSelect">
+                                <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                <option value="DD MMM YYYY">DD MMM YYYY</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Security Settings -->
+            <section id="security-section" class="settings-section">
+                <div class="section-header">
+                    <h2>Security Settings</h2>
+                    <p>Manage your account security and authentication</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-group">
+                        <h3>Change Password</h3>
+                        <p>Update your account password for better security</p>
+                        <div class="setting-control">
+                            <button class="btn btn-outline" onclick="showChangePasswordModal()">
+                                <i class="fas fa-key"></i> Change Password
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Two-Factor Authentication</h3>
+                        <p>Add an extra layer of security to your account</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="twoFactorToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Disabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Login Alerts</h3>
+                        <p>Get notified when someone logs into your account</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="loginAlertsToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Enabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Session Timeout</h3>
+                        <p>Automatically log out after period of inactivity</p>
+                        <div class="setting-control">
+                            <select class="form-control" id="sessionTimeoutSelect">
+                                <option value="15">15 minutes</option>
+                                <option value="30" selected>30 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="120">2 hours</option>
+                                <option value="0">Never</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notification Settings -->
+            <section id="notifications-section" class="settings-section">
+                <div class="section-header">
+                    <h2>Notification Settings</h2>
+                    <p>Control how you receive notifications</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-group">
+                        <h3>Email Notifications</h3>
+                        <p>Receive email updates about your account activity</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="emailNotificationsToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Enabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Security Alerts</h3>
+                        <p>Get notified about security-related events</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="securityAlertsToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Enabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Marketing Emails</h3>
+                        <p>Receive promotional emails and product updates</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="marketingEmailsToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Disabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Notification Frequency</h3>
+                        <p>How often should we send you digest emails</p>
+                        <div class="setting-control">
+                            <select class="form-control" id="notificationFrequencySelect">
+                                <option value="immediate">Immediate</option>
+                                <option value="daily">Daily Digest</option>
+                                <option value="weekly" selected>Weekly Digest</option>
+                                <option value="monthly">Monthly Digest</option>
+                                <option value="never">Never</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Privacy Settings -->
+            <section id="privacy-section" class="settings-section">
+                <div class="section-header">
+                    <h2>Privacy Settings</h2>
+                    <p>Control your privacy and data sharing preferences</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-group">
+                        <h3>Profile Visibility</h3>
+                        <p>Control who can see your profile information</p>
+                        <div class="setting-control">
+                            <select class="form-control" id="profileVisibilitySelect">
+                                <option value="public">Public</option>
+                                <option value="private" selected>Private</option>
+                                <option value="friends">Friends Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Data Analytics</h3>
+                        <p>Help us improve by sharing anonymous usage data</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="dataAnalyticsToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Disabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Cookies</h3>
+                        <p>Allow cookies for personalized experience</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="cookiesToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Enabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Download Your Data</h3>
+                        <p>Get a copy of all your personal data</p>
+                        <div class="setting-control">
+                            <button class="btn btn-outline" onclick="downloadUserData()">
+                                <i class="fas fa-download"></i> Download Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appearance Settings -->
+            <section id="appearance-section" class="settings-section">
+                <div class="section-header">
+                    <h2>Appearance Settings</h2>
+                    <p>Customize the look and feel of your interface</p>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="setting-group">
+                        <h3>Theme</h3>
+                        <p>Choose your preferred color theme</p>
+                        <div class="setting-control">
+                            <select class="form-control" id="themeSelect">
+                                <option value="light" selected>Light</option>
+                                <option value="dark">Dark</option>
+                                <option value="auto">Auto (System)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Font Size</h3>
+                        <p>Adjust the text size for better readability</p>
+                        <div class="setting-control">
+                            <select class="form-control" id="fontSizeSelect">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                                <option value="extra-large">Extra Large</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Compact Mode</h3>
+                        <p>Use a more compact interface layout</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="compactModeToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Disabled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <h3>Animations</h3>
+                        <p>Enable interface animations and transitions</p>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="animationsToggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span class="setting-status">Enabled</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Save Settings Button -->
+    <div class="settings-footer">
+        <button class="btn btn-primary" onclick="saveAllSettings()">
+            <i class="fas fa-save"></i> Save All Settings
+        </button>
+        <button class="btn btn-outline" onclick="resetSettings()">
+            <i class="fas fa-undo"></i> Reset to Defaults
+        </button>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+            <button class="modal-close" onclick="closeChangePasswordModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('currentPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" required minlength="8">
+                        <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmNewPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-save"></i> Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved settings
+    loadSettings();
+    
+    // Setup event listeners
+    setupEventListeners();
+    
+    // Setup change password form
+    setupChangePasswordForm();
+});
+
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.settings-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Show selected section
+    document.getElementById(sectionName + '-section').classList.add('active');
+    
+    // Add active class to clicked nav item
+    event.target.classList.add('active');
+}
+
+function loadSettings() {
+    // Load settings from localStorage
+    const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+    
+    // Apply settings to form controls
+    Object.keys(settings).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+            if (element.type === 'checkbox') {
+                element.checked = settings[key];
+            } else {
+                element.value = settings[key];
+            }
+        }
+    });
+}
+
+function setupEventListeners() {
+    // Add change listeners to all form controls
+    document.querySelectorAll('.form-control, .setting-control input[type="checkbox"]').forEach(element => {
+        element.addEventListener('change', function() {
+            updateSettingStatus(this);
+        });
+    });
+}
+
+function updateSettingStatus(element) {
+    // Update the status text for toggle switches
+    if (element.type === 'checkbox') {
+        const statusElement = element.parentElement.nextElementSibling;
+        if (statusElement && statusElement.classList.contains('setting-status')) {
+            statusElement.textContent = element.checked ? 'Enabled' : 'Disabled';
+        }
+    }
+}
+
+function saveAllSettings() {
+    const settings = {};
+    
+    // Collect all settings
+    document.querySelectorAll('.form-control, .setting-control input[type="checkbox"]').forEach(element => {
+        if (element.id) {
+            settings[element.id] = element.type === 'checkbox' ? element.checked : element.value;
+        }
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('userSettings', JSON.stringify(settings));
+    
+    // Show success message
+    showSuccessMessage('All settings saved successfully!');
+}
+
+function resetSettings() {
+    if (confirm('Are you sure you want to reset all settings to their default values?')) {
+        // Clear localStorage
+        localStorage.removeItem('userSettings');
+        
+        // Reset form controls to defaults
+        document.getElementById('languageSelect').value = 'en';
+        document.getElementById('timezoneSelect').value = 'EST';
+        document.getElementById('dateFormatSelect').value = 'MM/DD/YYYY';
+        document.getElementById('sessionTimeoutSelect').value = '30';
+        document.getElementById('notificationFrequencySelect').value = 'weekly';
+        document.getElementById('profileVisibilitySelect').value = 'private';
+        document.getElementById('themeSelect').value = 'light';
+        document.getElementById('fontSizeSelect').value = 'medium';
+        
+        // Reset checkboxes
+        document.getElementById('twoFactorToggle').checked = false;
+        document.getElementById('loginAlertsToggle').checked = true;
+        document.getElementById('emailNotificationsToggle').checked = true;
+        document.getElementById('securityAlertsToggle').checked = true;
+        document.getElementById('marketingEmailsToggle').checked = false;
+        document.getElementById('dataAnalyticsToggle').checked = false;
+        document.getElementById('cookiesToggle').checked = true;
+        document.getElementById('compactModeToggle').checked = false;
+        document.getElementById('animationsToggle').checked = true;
+        
+        // Update status texts
+        document.querySelectorAll('.setting-control input[type="checkbox"]').forEach(checkbox => {
+            updateSettingStatus(checkbox);
+        });
+        
+        showSuccessMessage('Settings reset to defaults!');
+    }
+}
+
+function showChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.getElementById('changePasswordForm').reset();
+}
+
+function setupChangePasswordForm() {
+    const form = document.getElementById('changePasswordForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        
+        if (newPassword !== confirmNewPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        
+        // Simulate API call
+        setTimeout(() => {
+            closeChangePasswordModal();
+            showSuccessMessage('Password updated successfully!');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 2000);
+    });
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const toggle = field.nextElementSibling.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        toggle.classList.remove('fa-eye');
+        toggle.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        toggle.classList.remove('fa-eye-slash');
+        toggle.classList.add('fa-eye');
+    }
+}
+
+function downloadUserData() {
+    // Create user data object
+    const userData = {
+        settings: JSON.parse(localStorage.getItem('userSettings') || '{}'),
+        preferences: {
+            theme: document.getElementById('themeSelect').value,
+            fontSize: document.getElementById('fontSizeSelect').value,
+            language: document.getElementById('languageSelect').value
+        },
+        exportDate: new Date().toISOString()
+    };
+    
+    // Create and download JSON file
+    const dataStr = JSON.stringify(userData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `user_settings_${Date.now()}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    showSuccessMessage('Settings data downloaded successfully!');
+}
+
+function showSuccessMessage(message) {
+    // Create success message element
+    const successDiv = document.createElement('div');
+    successDiv.className = 'flash-message flash-success';
+    successDiv.innerHTML = `
+        <div class="message-content">
+            <i class="fas fa-check-circle"></i>
+            <span>${message}</span>
+            <button class="message-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Insert at the top of main content
+    const mainContent = document.querySelector('.main-content');
+    mainContent.insertBefore(successDiv, mainContent.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (successDiv.parentElement) {
+            successDiv.remove();
+        }
+    }, 5000);
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('changePasswordModal');
+    if (event.target === modal) {
+        closeChangePasswordModal();
+    }
+});
+
+// Handle Escape key for modals
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeChangePasswordModal();
+    }
+});
+</script>
+{% endblock %}

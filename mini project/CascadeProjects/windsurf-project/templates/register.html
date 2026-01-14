@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}Register - User Registration System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .validation-feedback {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .validation-success {
+        color: #28a745;
+    }
+    
+    .validation-error {
+        color: #dc3545;
+    }
+    
+    .password-strength {
+        height: 5px;
+        border-radius: 3px;
+        margin-top: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .strength-weak {
+        background-color: #dc3545;
+        width: 33%;
+    }
+    
+    .strength-medium {
+        background-color: #ffc107;
+        width: 66%;
+    }
+    
+    .strength-strong {
+        background-color: #28a745;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Join us today! Fill in your details to get started.</p>
+        </div>
+        
+        <form id="registerForm" class="auth-form" method="POST" action="{{ url_for('auth.register') }}">
+            <!-- Username Field -->
+            <div class="form-group">
+                <label for="username" class="form-label">
+                    <i class="fas fa-user"></i>
+                    Username
+                </label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    class="form-control" 
+                    placeholder="Choose a username"
+                    value="{{ username or '' }}"
+                    required
+                    minlength="3"
+                    maxlength="20"
+                    pattern="[a-zA-Z0-9_]+"
+                    title="Username can only contain letters, numbers, and underscores"
+                >
+                <div class="form-help">3-20 characters, letters, numbers, and underscores only</div>
+                <div id="usernameFeedback" class="validation-feedback"></div>
+            </div>
+            
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i>
+                    Email Address
+                </label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-control" 
+                    placeholder="your@email.com"
+                    value="{{ email or '' }}"
+                    required
+                >
+                <div class="form-help">We'll never share your email with anyone else</div>
+                <div id="emailFeedback" class="validation-feedback"></div>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Password
+                </label>
+                <div class="password-input-container">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Create a strong password"
+                        required
+                        minlength="8"
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="form-help">
+                    Minimum 8 characters with uppercase, lowercase, and numbers
+                </div>
+                <div id="passwordStrength" class="password-strength"></div>
+                <div id="passwordFeedback" class="validation-feedback"></div>
+            </div>
+            
+            <!-- Confirm Password Field -->
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Confirm Password
+                </label>
+                <div class="password-input-container">
+                    <input 
+                        type="password" 
+                        id="confirm_password" 
+                        name="confirm_password" 
+                        class="form-control" 
+                        placeholder="Confirm your password"
+                        required
+                        minlength="8"
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div id="confirmPasswordFeedback" class="validation-feedback"></div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="auth-links">
+                <p>Already have an account? 
+                    <a href="{{ url_for('auth.login') }}" class="link-primary">Sign in here</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Real-time validation
+let validationTimeout;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    
+    // Username validation
+    usernameInput.addEventListener('input', function() {
+        clearTimeout(validationTimeout);
+        validationTimeout = setTimeout(() => validateUsername(), 500);
+    });
+    
+    // Email validation
+    emailInput.addEventListener('input', function() {
+        clearTimeout(validationTimeout);
+        validationTimeout = setTimeout(() => validateEmail(), 500);
+    });
+    
+    // Password validation
+    passwordInput.addEventListener('input', function() {
+        clearTimeout(validationTimeout);
+        validationTimeout = setTimeout(() => {
+            validatePassword();
+            updatePasswordStrength();
+            if (confirmPasswordInput.value) {
+                validateConfirmPassword();
+            }
+        }, 300);
+    });
+    
+    // Confirm password validation
+    confirmPasswordInput.addEventListener('input', function() {
+        clearTimeout(validationTimeout);
+        validationTimeout = setTimeout(() => validateConfirmPassword(), 300);
+    });
+    
+    // Form submission
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+        }
+    });
+});
+
+function validateUsername() {
+    const username = document.getElementById('username').value.trim();
+    const feedback = document.getElementById('usernameFeedback');
+    
+    if (username.length < 3) {
+        showValidationFeedback(feedback, 'Username must be at least 3 characters', false);
+        return false;
+    }
+    
+    if (username.length > 20) {
+        showValidationFeedback(feedback, 'Username must not exceed 20 characters', false);
+        return false;
+    }
+    
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        showValidationFeedback(feedback, 'Username can only contain letters, numbers, and underscores', false);
+        return false;
+    }
+    
+    // Check availability via AJAX
+    fetch(`/auth/check-username?username=${encodeURIComponent(username)}`)
+        .then(response => response.json())
+        .then(data => {
+            showValidationFeedback(feedback, data.message, data.available);
+        })
+        .catch(error => {
+            showValidationFeedback(feedback, 'Error checking username availability', false);
+        });
+    
+    return true;
+}
+
+function validateEmail() {
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const feedback = document.getElementById('emailFeedback');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email) {
+        showValidationFeedback(feedback, 'Email is required', false);
+        return false;
+    }
+    
+    if (!emailPattern.test(email)) {
+        showValidationFeedback(feedback, 'Please enter a valid email address', false);
+        return false;
+    }
+    
+    // Check availability via AJAX
+    fetch(`/auth/check-email?email=${encodeURIComponent(email)}`)
+        .then(response => response.json())
+        .then(data => {
+            showValidationFeedback(feedback, data.message, data.available);
+        })
+        .catch(error => {
+            showValidationFeedback(feedback, 'Error checking email availability', false);
+        });
+    
+    return true;
+}
+
+function validatePassword() {
+    const password = document.getElementById('password').value;
+    const feedback = document.getElementById('passwordFeedback');
+    
+    if (password.length < 8) {
+        showValidationFeedback(feedback, 'Password must be at least 8 characters long', false);
+        return false;
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+        showValidationFeedback(feedback, 'Password must contain at least one uppercase letter', false);
+        return false;
+    }
+    
+    if (!/[a-z]/.test(password)) {
+        showValidationFeedback(feedback, 'Password must contain at least one lowercase letter', false);
+        return false;
+    }
+    
+    if (!/\d/.test(password)) {
+        showValidationFeedback(feedback, 'Password must contain at least one digit', false);
+        return false;
+    }
+    
+    showValidationFeedback(feedback, 'Strong password', true);
+    return true;
+}
+
+function validateConfirmPassword() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const feedback = document.getElementById('confirmPasswordFeedback');
+    
+    if (password !== confirmPassword) {
+        showValidationFeedback(feedback, 'Passwords do not match', false);
+        return false;
+    }
+    
+    showValidationFeedback(feedback, 'Passwords match', true);
+    return true;
+}
+
+function updatePasswordStrength() {
+    const password = document.getElementById('password').value;
+    const strengthBar = document.getElementById('passwordStrength');
+    
+    let strength = 0;
+    
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    strengthBar.className = 'password-strength';
+    
+    if (strength <= 2) {
+        strengthBar.classList.add('strength-weak');
+    } else if (strength <= 4) {
+        strengthBar.classList.add('strength-medium');
+    } else {
+        strengthBar.classList.add('strength-strong');
+    }
+}
+
+function showValidationFeedback(element, message, isValid) {
+    element.textContent = message;
+    element.className = 'validation-feedback ' + (isValid ? 'validation-success' : 'validation-error');
+}
+
+function validateForm() {
+    const isUsernameValid = validateUsername();
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+    const isConfirmPasswordValid = validateConfirmPassword();
+    
+    return isUsernameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid;
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const toggle = field.nextElementSibling.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        toggle.classList.remove('fa-eye');
+        toggle.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        toggle.classList.remove('fa-eye-slash');
+        toggle.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}

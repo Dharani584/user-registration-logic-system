@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Home - User Registration System{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to User Registration System</h1>
+            <p class="hero-subtitle">
+                A secure and modern authentication system built with Flask and SQLAlchemy. 
+                Experience seamless user management with robust security features.
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
+                    <i class="fas fa-user-plus"></i>
+                    Get Started
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-large">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </a>
+            </div>
+        </div>
+        
+        <div class="hero-image">
+            <div class="hero-illustration">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Secure Authentication</h3>
+                <p>Password hashing with bcrypt and secure session management to protect user data.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h3>User Validation</h3>
+                <p>Comprehensive input validation on both frontend and backend to ensure data integrity.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Responsive Design</h3>
+                <p>Fully responsive interface that works seamlessly on desktop, tablet, and mobile devices.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Session Management</h3>
+                <p>Automatic session timeout and secure cookie handling for enhanced security.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3>SQLite Database</h3>
+                <p>Lightweight and reliable database storage for user information and session data.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>Clean Code</h3>
+                <p>Well-structured, commented code following MVC pattern for maintainability.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="tech-stack-section">
+    <div class="container">
+        <h2 class="section-title">Technology Stack</h2>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <i class="fab fa-python"></i>
+                <span>Python</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-flask"></i>
+                <span>Flask</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-database"></i>
+                <span>SQLAlchemy</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-database"></i>
+                <span>SQLite</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-html5"></i>
+                <span>HTML5</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-css3-alt"></i>
+                <span>CSS3</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-js"></i>
+                <span>JavaScript</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Bcrypt</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Get Started?</h2>
+            <p>Join our secure platform today and experience modern user authentication.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-large">
+                    Create Account
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-large">
+                    Login
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

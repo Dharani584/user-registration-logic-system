@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}User Registration System{% endblock %}</title>
+    
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="{{ url_for('main.index') }}" class="brand-link">
+                        <i class="fas fa-user-shield"></i>
+                        <span>AuthSystem</span>
+                    </a>
+                </div>
+                
+                <div class="nav-menu">
+                    {% if session.user_id %}
+                        <!-- Authenticated user menu -->
+                        <div class="nav-links">
+                            <a href="{{ url_for('main.dashboard') }}" class="nav-link">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                            <a href="{{ url_for('main.profile') }}" class="nav-link">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                            <a href="{{ url_for('main.settings') }}" class="nav-link">
+                                <i class="fas fa-cog"></i> Settings
+                            </a>
+                            <a href="{{ url_for('auth.logout') }}" class="nav-link logout-link">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                        
+                        <!-- User dropdown for mobile -->
+                        <div class="user-dropdown">
+                            <button class="dropdown-toggle" onclick="toggleDropdown()">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ session.username }}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-menu" id="userDropdown">
+                                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                                <a href="{{ url_for('main.profile') }}">Profile</a>
+                                <a href="{{ url_for('main.settings') }}">Settings</a>
+                                <hr>
+                                <a href="{{ url_for('auth.logout') }}">Logout</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Non-authenticated user menu -->
+                        <div class="nav-links">
+                            <a href="{{ url_for('main.index') }}" class="nav-link">
+                                <i class="fas fa-home"></i> Home
+                            </a>
+                            <a href="{{ url_for('auth.login') }}" class="nav-link">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                            <a href="{{ url_for('auth.register') }}" class="nav-link btn-primary">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile menu toggle -->
+                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        <div class="message-content">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle"></i>
+                            {% elif category == 'error' %}
+                                <i class="fas fa-exclamation-circle"></i>
+                            {% elif category == 'warning' %}
+                                <i class="fas fa-exclamation-triangle"></i>
+                            {% elif category == 'info' %}
+                                <i class="fas fa-info-circle"></i>
+                            {% endif %}
+                            <span>{{ message }}</span>
+                            <button class="message-close" onclick="closeFlashMessage(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>User Registration System</h4>
+                    <p>A secure authentication system built with Flask, SQLAlchemy, and modern web technologies.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                        {% if session.user_id %}
+                            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                            <li><a href="{{ url_for('main.profile') }}">Profile</a></li>
+                        {% else %}
+                            <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                            <li><a href="{{ url_for('auth.register') }}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Technologies</h4>
+                    <ul>
+                        <li>Flask</li>
+                        <li>SQLAlchemy</li>
+                        <li>SQLite</li>
+                        <li>Bootstrap</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 User Registration System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

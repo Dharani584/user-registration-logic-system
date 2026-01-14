@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - User Registration System{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <div class="avatar-circle">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <div class="profile-info">
+            <h1>{{ user.username }}</h1>
+            <p class="profile-email">{{ user.email }}</p>
+            <span class="status-badge status-active">Active Account</span>
+        </div>
+        <div class="profile-actions">
+            <button class="btn btn-primary" onclick="enableEditProfile()">
+                <i class="fas fa-edit"></i>
+                Edit Profile
+            </button>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-grid">
+            <!-- Personal Information Card -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user"></i> Personal Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-list">
+                        <div class="info-row">
+                            <label>Username</label>
+                            <span id="displayUsername">{{ user.username }}</span>
+                            <input type="text" id="editUsername" value="{{ user.username }}" style="display:none;" class="form-control">
+                        </div>
+                        <div class="info-row">
+                            <label>Email Address</label>
+                            <span id="displayEmail">{{ user.email }}</span>
+                            <input type="email" id="editEmail" value="{{ user.email }}" style="display:none;" class="form-control">
+                        </div>
+                        <div class="info-row">
+                            <label>User ID</label>
+                            <span>{{ user.id }}</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Account Created</label>
+                            <span>{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Unknown' }}</span>
+                        </div>
+                        <div class="info-row">
+                            <label>Last Login</label>
+                            <span>{{ user.last_login.strftime('%B %d, %Y at %I:%M %p') if user.last_login else 'Never' }}</span>
+                        </div>
+                    </div>
+                    <div class="edit-actions" id="editActions" style="display:none;">
+                        <button class="btn btn-success" onclick="saveProfile()">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button class="btn btn-outline" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Settings Card -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> Security Settings</h3>
+                </div>
+                <div class="card-body">
+                    <div class="security-options">
+                        <div class="security-option">
+                            <div class="option-info">
+                                <h4>Change Password</h4>
+                                <p>Update your account password for better security</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="showChangePasswordModal()">
+                                <i class="fas fa-key"></i> Change
+                            </button>
+                        </div>
+                        
+                        <div class="security-option">
+                            <div class="option-info">
+                                <h4>Two-Factor Authentication</h4>
+                                <p>Add an extra layer of security to your account</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="enable2FA()">
+                                <i class="fas fa-mobile-alt"></i> Enable
+                            </button>
+                        </div>
+                        
+                        <div class="security-option">
+                            <div class="option-info">
+                                <h4>Login Sessions</h4>
+                                <p>Manage your active login sessions</p>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="showSessions()">
+                                <i class="fas fa-desktop"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Account Preferences Card -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-cog"></i> Account Preferences</h3>
+                </div>
+                <div class="card-body">
+                    <div class="preferences-list">
+                        <div class="preference-item">
+                            <label class="switch">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <div class="preference-info">
+                                <h4>Email Notifications</h4>
+                                <p>Receive email updates about your account</p>
+                            </div>
+                        </div>
+                        
+                        <div class="preference-item">
+                            <label class="switch">
+                                <input type="checkbox" id="loginAlerts" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <div class="preference-info">
+                                <h4>Login Alerts</h4>
+                                <p>Get notified when someone logs into your account</p>
+                            </div>
+                        </div>
+                        
+                        <div class="preference-item">
+                            <label class="switch">
+                                <input type="checkbox" id="dataAnalytics">
+                                <span class="slider"></span>
+                            </label>
+                            <div class="preference-info">
+                                <h4>Data Analytics</h4>
+                                <p>Help us improve by sharing anonymous usage data</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone Card -->
+            <div class="profile-card danger-zone">
+                <div class="card-header">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                </div>
+                <div class="card-body">
+                    <div class="danger-actions">
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h4>Deactivate Account</h4>
+                                <p>Temporarily disable your account. You can reactivate it later.</p>
+                            </div>
+                            <button class="btn btn-outline btn-warning" onclick="deactivateAccount()">
+                                <i class="fas fa-pause"></i> Deactivate
+                            </button>
+                        </div>
+                        
+                        <div class="danger-item">
+                            <div class="danger-info">
+                                <h4>Delete Account</h4>
+                                <p>Permanently delete your account and all associated data.</p>
+                            </div>
+                            <button class="btn btn-outline btn-danger" onclick="deleteAccount()">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-key"></i> Change Password</h3>
+            <button class="modal-close" onclick="closeChangePasswordModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('currentPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" required minlength="8">
+                        <button type="button" class="password-toggle" onclick="togglePassword('newPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-help">Minimum 8 characters with uppercase, lowercase, and numbers</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmNewPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-save"></i> Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load user preferences
+    loadUserPreferences();
+    
+    // Setup form handlers
+    setupChangePasswordForm();
+});
+
+function enableEditProfile() {
+    // Show edit fields
+    document.getElementById('displayUsername').style.display = 'none';
+    document.getElementById('displayEmail').style.display = 'none';
+    document.getElementById('editUsername').style.display = 'block';
+    document.getElementById('editEmail').style.display = 'block';
+    document.getElementById('editActions').style.display = 'block';
+}
+
+function saveProfile() {
+    const newUsername = document.getElementById('editUsername').value.trim();
+    const newEmail = document.getElementById('editEmail').value.trim();
+    
+    // Basic validation
+    if (!newUsername || !newEmail) {
+        alert('Username and email are required');
+        return;
+    }
+    
+    // Show loading state
+    const saveBtn = document.querySelector('#editActions .btn-success');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    // Simulate API call
+    setTimeout(() => {
+        // Update display
+        document.getElementById('displayUsername').textContent = newUsername;
+        document.getElementById('displayEmail').textContent = newEmail;
+        
+        // Hide edit fields
+        document.getElementById('displayUsername').style.display = 'block';
+        document.getElementById('displayEmail').style.display = 'block';
+        document.getElementById('editUsername').style.display = 'none';
+        document.getElementById('editEmail').style.display = 'none';
+        document.getElementById('editActions').style.display = 'none';
+        
+        // Reset button
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+        
+        // Show success message
+        showSuccessMessage('Profile updated successfully!');
+    }, 1500);
+}
+
+function cancelEdit() {
+    // Reset values
+    document.getElementById('editUsername').value = document.getElementById('displayUsername').textContent;
+    document.getElementById('editEmail').value = document.getElementById('displayEmail').textContent;
+    
+    // Hide edit fields
+    document.getElementById('displayUsername').style.display = 'block';
+    document.getElementById('displayEmail').style.display = 'block';
+    document.getElementById('editUsername').style.display = 'none';
+    document.getElementById('editEmail').style.display = 'none';
+    document.getElementById('editActions').style.display = 'none';
+}
+
+function showChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeChangePasswordModal() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    document.getElementById('changePasswordForm').reset();
+}
+
+function setupChangePasswordForm() {
+    const form = document.getElementById('changePasswordForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        
+        // Validation
+        if (newPassword !== confirmNewPassword) {
+            alert('New passwords do not match');
+            return;
+        }
+        
+        if (newPassword.length < 8) {
+            alert('Password must be at least 8 characters long');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        
+        // Simulate API call
+        setTimeout(() => {
+            closeChangePasswordModal();
+            showSuccessMessage('Password updated successfully!');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }, 2000);
+    });
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const toggle = field.nextElementSibling.querySelector('i');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        toggle.classList.remove('fa-eye');
+        toggle.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        toggle.classList.remove('fa-eye-slash');
+        toggle.classList.add('fa-eye');
+    }
+}
+
+function loadUserPreferences() {
+    // Load preferences from localStorage or API
+    const preferences = {
+        emailNotifications: localStorage.getItem('emailNotifications') !== 'false',
+        loginAlerts: localStorage.getItem('loginAlerts') !== 'false',
+        dataAnalytics: localStorage.getItem('dataAnalytics') === 'true'
+    };
+    
+    document.getElementById('emailNotifications').checked = preferences.emailNotifications;
+    document.getElementById('loginAlerts').checked = preferences.loginAlerts;
+    document.getElementById('dataAnalytics').checked = preferences.dataAnalytics;
+    
+    // Add change listeners
+    document.getElementById('emailNotifications').addEventListener('change', function() {
+        localStorage.setItem('emailNotifications', this.checked);
+        showSuccessMessage('Email notifications preference updated');
+    });
+    
+    document.getElementById('loginAlerts').addEventListener('change', function() {
+        localStorage.setItem('loginAlerts', this.checked);
+        showSuccessMessage('Login alerts preference updated');
+    });
+    
+    document.getElementById('dataAnalytics').addEventListener('change', function() {
+        localStorage.setItem('dataAnalytics', this.checked);
+        showSuccessMessage('Data analytics preference updated');
+    });
+}
+
+function enable2FA() {
+    alert('Two-factor authentication setup would be implemented here in a production environment.');
+}
+
+function showSessions() {
+    alert('Active sessions management would be implemented here in a production environment.');
+}
+
+function deactivateAccount() {
+    if (confirm('Are you sure you want to deactivate your account? You can reactivate it later.')) {
+        showSuccessMessage('Account deactivation request submitted. You will receive an email confirmation.');
+    }
+}
+
+function deleteAccount() {
+    const confirmation = prompt('To delete your account, type "DELETE" in all caps:');
+    if (confirmation === 'DELETE') {
+        if (confirm('This action cannot be undone. All your data will be permanently deleted. Are you absolutely sure?')) {
+            showSuccessMessage('Account deletion request submitted. You will receive an email confirmation.');
+        }
+    } else if (confirmation !== null) {
+        alert('Invalid confirmation. Account deletion cancelled.');
+    }
+}
+
+function showSuccessMessage(message) {
+    // Create success message element
+    const successDiv = document.createElement('div');
+    successDiv.className = 'flash-message flash-success';
+    successDiv.innerHTML = `
+        <div class="message-content">
+            <i class="fas fa-check-circle"></i>
+            <span>${message}</span>
+            <button class="message-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Insert at the top of main content
+    const mainContent = document.querySelector('.main-content');
+    mainContent.insertBefore(successDiv, mainContent.firstChild);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (successDiv.parentElement) {
+            successDiv.remove();
+        }
+    }, 5000);
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('changePasswordModal');
+    if (event.target === modal) {
+        closeChangePasswordModal();
+    }
+});
+
+// Handle Escape key for modals
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeChangePasswordModal();
+    }
+});
+</script>
+{% endblock %}
